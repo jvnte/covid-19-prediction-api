@@ -51,7 +51,6 @@ class CovidModel:
         return forecaster
 
     def fit(self):
-        print(self.y_train)
         model = self.forecaster
         model.fit(self.y_train)
 
