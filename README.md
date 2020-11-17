@@ -3,6 +3,13 @@
 A API that makes predictions for COVID-19 cases in Germany. The data is fetched using [STATWORX COVID-19 API](https://github.com/STATWORX/covid-19-api)
 and [FastAPI](https://fastapi.tiangolo.com/) is used as web framework for building the API.
 
+## Currently implemented models
+
+The following models are currently implemented:
+
+- [AutoARIMA](https://www.sktime.org/en/latest/modules/auto_generated/sktime.forecasting.arima.AutoARIMA.html#sktime.forecasting.arima.AutoARIMA)
+- [Prophet (from Facebook Open Source)](https://facebook.github.io/prophet/)
+
 ## Run API locally
 
 Within the project root directory run the API within you CLI as follows:
@@ -26,14 +33,6 @@ The default JSON request body:
   "horizon": 7
 }
 ```
-
-
-## Currently implemented models
-
-The following models are currently implemented:
-
-- [AutoARIMA](https://www.sktime.org/en/latest/modules/auto_generated/sktime.forecasting.arima.AutoARIMA.html#sktime.forecasting.arima.AutoARIMA)
-- [Prophet (from Facebook Open Source)](https://facebook.github.io/prophet/)
 
 
 
