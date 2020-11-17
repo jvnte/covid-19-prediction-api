@@ -19,7 +19,7 @@ def predict(covid: CovidInput):
     pred_dates = pd.date_range(start=data['pred_start'], periods=data['horizon']).to_period('D')
 
     # Make forecast
-    forecast = model.predict(pred_dates).to_list()
+    forecast = model.predict(pred_dates, data['type']).to_list()
 
     return {'date': pred_dates.astype(str).tolist(),
             'forecast': forecast}

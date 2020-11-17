@@ -18,7 +18,7 @@ def fetch_timeseries(code: str = 'DE'):
     return df
 
 
-def prep_timeseries(df, pred_start, horizon):
+def prep_univariate(df, pred_start, horizon):
     # Get covid cases
     df = df[['date', 'cases']]
 
@@ -37,5 +37,17 @@ def prep_timeseries(df, pred_start, horizon):
 
     # Make temporal split
     y_train, y_test = temporal_train_test_split(df, test_size=horizon)
+
+    return y_train, y_test
+
+
+def prep_prophet(y_train, y_test):
+    # Transform Series to Dataframe and rename columns
+    y_train = y_train.to_frame().reset_index().rename(columns={'date': 'ds', 'cases': 'y'})
+    y_test = y_test.to_frame().reset_index().rename(columns={'date': 'ds', 'cases': 'y'})
+
+    # Transform date column to datetime
+    y_train['ds'] = pd.to_datetime(y_train['ds'].astype('str'))
+    y_test['ds'] = pd.to_datetime(y_test['ds'].astype('str'))
 
     return y_train, y_test

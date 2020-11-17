@@ -33,7 +33,7 @@ The default JSON request body:
 The following models are currently implemented:
 
 - [AutoARIMA](https://www.sktime.org/en/latest/modules/auto_generated/sktime.forecasting.arima.AutoARIMA.html#sktime.forecasting.arima.AutoARIMA)
-
+- [Prophet (from Facebook Open Source)](https://facebook.github.io/prophet/)
 
 
 
