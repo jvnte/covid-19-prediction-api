@@ -11,5 +11,8 @@ uvicorn~=0.12.2
 fastapi~=0.61.2
 numpy~=1.19.2
 streamlit==0.71.0
-mxnet==1.7.0.post1
 gluonts==0.6.1
+fbprophet~=0.7.1
+orjson~=3.4.3
+starlette~=0.13.6
+plotly~=4.12.0

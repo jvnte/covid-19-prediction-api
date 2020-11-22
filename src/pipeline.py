@@ -20,8 +20,26 @@ def fetch_timeseries(code: str = 'DE'):
 
 
 def prep_univariate(df, pred_start, horizon, type, freq):
+    # Get covid cases
+    df = df[['date', 'cases']]
+
+    # Convert to Series object and set index
+    df = df.set_index('date').iloc[:, 0]
+
+    # Convert index to period index
+    df.index = pd.to_datetime(df.index).to_period('D')
+
+    # Define cutoff
+    cut_off = (datetime.strptime(pred_start, "%Y-%m-%d")
+               - timedelta(days=1)
+               + timedelta(days=horizon)).strftime('%Y-%m-%d')
+
+    # Cut timeseries
+    df = df.loc[:cut_off]
+
     if type == 'deepar':
-        ts = df.cases.to_numpy()
+        # Get timeseries
+        ts = df.to_numpy()
         start = pd.Timestamp("31-12-2019", freq=freq)
 
         # train dataset: cut the last window of length "prediction_length", add "target" and "start" fields
@@ -32,22 +50,6 @@ def prep_univariate(df, pred_start, horizon, type, freq):
                              freq=freq)
 
     else:
-        # Get covid cases
-        df = df[['date', 'cases']]
-
-        # Convert to Series object and set index
-        df = df.set_index('date').iloc[:, 0]
-
-        # Convert index to period index
-        df.index = pd.to_datetime(df.index).to_period('D')
-
-        # Slice timeseries
-        cut_off = (datetime.strptime(pred_start, "%Y-%m-%d")
-                   - timedelta(days=1)
-                   + timedelta(days=horizon)).strftime('%Y-%m-%d')
-
-        df = df.loc[:cut_off]
-
         # Make temporal split
         y_train, y_test = temporal_train_test_split(df, test_size=horizon)
 

@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from fbprophet import Prophet
 from sktime.forecasting.arima import AutoARIMA
 
+from gluonts.dataset.util import to_pandas
 from gluonts.model.deepar import DeepAREstimator
 from gluonts.mx.trainer import Trainer
 from gluonts.evaluation.backtest import make_evaluation_predictions
@@ -42,6 +43,8 @@ class CovidModel:
         except ImportError:
             print(f'Not able to fetch COVID-19 data of country {code} from STATWORX API')
 
+        self.y_train, self.y_test = prep_univariate(self.input, pred_start, horizon, type, self.freq)
+
         # Load model from directory if it has been trained already, otherwise train it
         try:
             # Get test data for gluonts models
@@ -52,15 +55,9 @@ class CovidModel:
             print(f'Creating new {type} model with test period starting from {pred_start} '
                   f'and prediction horizon of {horizon} days')
 
-            if type in UNIVARIATE_MODELS:
-                # Prepare univariate timeseries
-                self.y_train, self.y_test = prep_univariate(self.input, pred_start, horizon, type, self.freq)
-
-                if type == 'prophet':
-                    self.y_train, self.y_test = prep_prophet(self.y_train, self.y_test)
-
-            elif self.model in MULTIVARIATE_MODELS:
-                pass
+            # Prepare prophet data
+            if type == 'prophet':
+                self.y_train, self.y_test = prep_prophet(self.y_train, self.y_test)
 
             # Train and fit selected model
             self.forecaster = self.train()
@@ -106,21 +103,50 @@ class CovidModel:
         fh = np.arange(len(pred_dates)) + 1
 
         if self.type == 'deepar':
-            _, ts_it = make_evaluation_predictions(
+            forecast_it, _ = make_evaluation_predictions(
                 dataset=self.y_test,
                 predictor=self.model,
                 num_samples=len(pred_dates),
             )
 
-            y_pred = list(ts_it)[0][0].to_numpy()[-self.horizon:].tolist()
+            y_pred = list(forecast_it)[0].mean.tolist()
 
         elif self.type == 'prophet':
             future = self.model.make_future_dataframe(periods=len(pred_dates), include_history=False)
             y_pred = self.model.predict(future).yhat.tolist()
+
+            # Make to Series for output preparation
+            self.y_train = self.y_train.set_index('ds').iloc[:, 0]
+            self.y_test = self.y_test.set_index('ds').iloc[:, 0]
         else:
             y_pred = self.model.predict(fh).tolist()
 
         return y_pred
+
+    def prepare_output(self, forecasts):
+        if self.type == 'deepar':
+            # From iterator to pandas
+            train = to_pandas(next(iter(self.y_train)))
+            test = to_pandas(next(iter(self.y_test)))
+
+            date = test.index.astype(str).tolist()
+
+            target = test.tolist()
+
+            prediction = np.full(len(train.index), np.nan).tolist()
+            prediction.extend(forecasts)
+
+        else:
+            date = self.y_train.index.astype(str).tolist()
+            date.extend(self.y_test.index.astype(str).tolist())
+
+            target = self.y_train.tolist()
+            target.extend(self.y_test.tolist())
+
+            prediction = np.full(len(self.y_train.index), np.nan).tolist()
+            prediction.extend(forecasts)
+
+        return date, target, prediction
 
 
 if __name__ == '__main__':

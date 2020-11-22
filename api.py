@@ -1,15 +1,26 @@
 import uvicorn
+import orjson
+import typing
 
+from starlette.responses import JSONResponse
 from src.train import *
 from fastapi import FastAPI
 
-api = FastAPI()
+
+# Define custom JSON library for handling nan
+class ORJSONResponse(JSONResponse):
+    media_type = "application/json"
+
+    def render(self, content: typing.Any) -> bytes:
+        return orjson.dumps(content)
+
+
+api = FastAPI(default_response_class=ORJSONResponse)
+
 
 # Expose the prediction functionality
 @api.post('/predict')
 def predict(covid: CovidInput):
-    # TODO Get dates and values from past 5 Weeks
-
     # Get parameters from API call
     data = covid.dict()
 
@@ -17,11 +28,14 @@ def predict(covid: CovidInput):
     model = CovidModel(data['pred_start'], data['type'], data['horizon'])
     pred_dates = pd.date_range(start=data['pred_start'], periods=data['horizon']).to_period('D')
 
-    # Make forecast
-    forecast = model.predict(pred_dates)
+    forecasts = model.predict(pred_dates)
 
-    return {'date': pred_dates.astype(str).tolist(),
-            'forecast': forecast}
+    # Prepare output
+    date, target, prediction = model.prepare_output(forecasts)
+
+    return {'date': date,
+            'target': target,
+            'prediction': prediction}
 
 
 if __name__ == '__main__':
