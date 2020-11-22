@@ -1,5 +1,4 @@
 import uvicorn
-import pandas as pd
 
 from src.train import *
 from fastapi import FastAPI
@@ -19,7 +18,7 @@ def predict(covid: CovidInput):
     pred_dates = pd.date_range(start=data['pred_start'], periods=data['horizon']).to_period('D')
 
     # Make forecast
-    forecast = model.predict(pred_dates, data['type']).to_list()
+    forecast = model.predict(pred_dates)
 
     return {'date': pred_dates.astype(str).tolist(),
             'forecast': forecast}

@@ -2,6 +2,7 @@ import requests
 import json
 import pandas as pd
 
+from gluonts.dataset.common import ListDataset
 from sktime.forecasting.model_selection import temporal_train_test_split
 from datetime import datetime, timedelta
 
@@ -18,25 +19,37 @@ def fetch_timeseries(code: str = 'DE'):
     return df
 
 
-def prep_univariate(df, pred_start, horizon):
-    # Get covid cases
-    df = df[['date', 'cases']]
+def prep_univariate(df, pred_start, horizon, type, freq):
+    if type == 'deepar':
+        ts = df.cases.to_numpy()
+        start = pd.Timestamp("31-12-2019", freq=freq)
 
-    # Convert to Series object and set index
-    df = df.set_index('date').iloc[:,0]
+        # train dataset: cut the last window of length "prediction_length", add "target" and "start" fields
+        y_train = ListDataset([{'target': ts[:-horizon], 'start': start}],
+                              freq=freq)
+        # test dataset: use the whole dataset, add "target" and "start" fields
+        y_test = ListDataset([{'target': ts, 'start': start}],
+                             freq=freq)
 
-    # Convert index to period index
-    df.index = pd.to_datetime(df.index).to_period('D')
+    else:
+        # Get covid cases
+        df = df[['date', 'cases']]
 
-    # Slice timeseries
-    cut_off = (datetime.strptime(pred_start, "%Y-%m-%d")
-               - timedelta(days=1)
-               + timedelta(days=horizon)).strftime('%Y-%m-%d')
+        # Convert to Series object and set index
+        df = df.set_index('date').iloc[:, 0]
 
-    df = df.loc[:cut_off]
+        # Convert index to period index
+        df.index = pd.to_datetime(df.index).to_period('D')
 
-    # Make temporal split
-    y_train, y_test = temporal_train_test_split(df, test_size=horizon)
+        # Slice timeseries
+        cut_off = (datetime.strptime(pred_start, "%Y-%m-%d")
+                   - timedelta(days=1)
+                   + timedelta(days=horizon)).strftime('%Y-%m-%d')
+
+        df = df.loc[:cut_off]
+
+        # Make temporal split
+        y_train, y_test = temporal_train_test_split(df, test_size=horizon)
 
     return y_train, y_test
 
