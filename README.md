@@ -12,19 +12,6 @@ The following models are currently implemented:
 - [Prophet](https://facebook.github.io/prophet/)
 - [DeepAR](https://ts.gluon.ai/api/gluonts/gluonts.model.deepar.html)
 
-## Run Dashboard and API locally
-
-To host the dashboard and API locally run the following command within project root directory
-
-```shell
-make setup
-make run
-```
-
-These commands install all the required packages and start the API and dashboard. The dashboard should start in a new 
-browser tab at http://localhost:8501/, while the API is running at http://localhost:8000/. To interact with the API only 
-check out the next section.
-
 ## Run API only
 
 Within the project root directory run the API within you CLI as follows:
@@ -48,6 +35,19 @@ The default JSON request body:
   "horizon": 7
 }
 ```
+
+## Run Dashboard and API locally
+
+To host the dashboard and API locally run the following command within project root directory
+
+```shell
+make setup
+make run
+```
+
+These commands install all the required packages and start the API and dashboard. The dashboard should start in a new 
+browser tab at http://localhost:8501/, while the API is running at http://localhost:8000/. To interact with the API only 
+check out the previous section.
 
 
 
