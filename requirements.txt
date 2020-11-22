@@ -10,3 +10,6 @@ pydantic~=1.6
 uvicorn~=0.12.2
 fastapi~=0.61.2
 numpy~=1.19.2
+streamlit==0.71.0
+mxnet==1.7.0.post1
+gluonts==0.6.1
