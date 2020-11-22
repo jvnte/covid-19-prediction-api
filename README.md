@@ -8,8 +8,8 @@ and [FastAPI](https://fastapi.tiangolo.com/) is used as web framework for buildi
 The following models are currently implemented:
 
 - [AutoARIMA](https://www.sktime.org/en/latest/modules/auto_generated/sktime.forecasting.arima.AutoARIMA.html#sktime.forecasting.arima.AutoARIMA)
-- [Prophet (from Facebook Open Source)](https://facebook.github.io/prophet/)
-
+- [Prophet](https://facebook.github.io/prophet/)
+- [DeepAR](https://ts.gluon.ai/api/gluonts/gluonts.model.deepar.html)
 ## Run API locally
 
 Within the project root directory run the API within you CLI as follows:
@@ -22,7 +22,7 @@ Access FastAPI UI by open your browser at http://127.0.0.1:8000/docs. Open the P
 You can manipulate the JSON request body as you desire. Clicking on *Execute* does the following:
  
 - Make an API call to [STATWORX COVID-19 API](https://github.com/STATWORX/covid-19-api) to fetch the latest data
-- Check whether the desired model has already been trained and eventually trains it 
+- Check whether the desired model has already been trained at *pred_start* and trains it if is has not been trained
 - Makes prediction in your desired prediction horizon
 
 The default JSON request body:
