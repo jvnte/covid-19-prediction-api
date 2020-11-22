@@ -1,6 +1,6 @@
 ## Welcome to COVID-19 AutoML API	
 
-A API that makes predictions for COVID-19 cases in Germany. The data is fetched using [STATWORX COVID-19 API](https://github.com/STATWORX/covid-19-api)
+An API that makes predictions for COVID-19 cases in Germany. The data is fetched using [STATWORX COVID-19 API](https://github.com/STATWORX/covid-19-api)
 and [FastAPI](https://fastapi.tiangolo.com/) is used as web framework for building the API. There is also a small
 [Streamlit](https://www.streamlit.io/) dashboard that allows you to easily interact with the API.
 
@@ -11,19 +11,6 @@ The following models are currently implemented:
 - [AutoARIMA](https://www.sktime.org/en/latest/modules/auto_generated/sktime.forecasting.arima.AutoARIMA.html#sktime.forecasting.arima.AutoARIMA)
 - [Prophet](https://facebook.github.io/prophet/)
 - [DeepAR](https://ts.gluon.ai/api/gluonts/gluonts.model.deepar.html)
-
-## Run Dashboard and API locally
-
-To host the dashboard and API locally run the following command within project root directory
-
-```shell
-make setup
-make run
-```
-
-These commands install all the required packages and start the API and dashboard. The dashboard should start in a new 
-browser tab at http://localhost:8501/, while the API is running at http://localhost:8000/. To interact with the API only 
-check out the next section.
 
 ## Run API only
 
@@ -48,6 +35,19 @@ The default JSON request body:
   "horizon": 7
 }
 ```
+
+## Run Dashboard and API locally
+
+To host the dashboard and API locally run the following command within project root directory
+
+```shell
+make setup
+make run
+```
+
+These commands install all the required packages and start the API and dashboard. The dashboard should start in a new 
+browser tab at http://localhost:8501/, while the API is running at http://localhost:8000/. To interact with the API only 
+check out the previous section.
 
 
 
