@@ -118,7 +118,7 @@ class CovidModel:
             future = self.model.make_future_dataframe(periods=len(pred_dates), include_history=False)
             y_pred = self.model.predict(future).yhat.tolist()
         else:
-            y_pred = self.model.predict(fh)
+            y_pred = self.model.predict(fh).tolist()
 
         return y_pred
 
@@ -133,8 +133,4 @@ if __name__ == '__main__':
     forecast = model.predict(pred_dates)
     print(forecast)
 
-# models
-# XGB
-# RFRegression
-# TBATS
 
