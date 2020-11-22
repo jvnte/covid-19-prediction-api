@@ -1,6 +1,6 @@
 ## Welcome to COVID-19 AutoML API	
 
-A API that makes predictions for COVID-19 cases in Germany. The data is fetched using [STATWORX COVID-19 API](https://github.com/STATWORX/covid-19-api)
+An API that makes predictions for COVID-19 cases in Germany. The data is fetched using [STATWORX COVID-19 API](https://github.com/STATWORX/covid-19-api)
 and [FastAPI](https://fastapi.tiangolo.com/) is used as web framework for building the API. There is also a small
 [Streamlit](https://www.streamlit.io/) dashboard that allows you to easily interact with the API.
 
