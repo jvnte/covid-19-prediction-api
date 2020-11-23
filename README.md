@@ -20,11 +20,11 @@ Within the project root directory run the API within you CLI as follows:
 uvicorn api:api --reload
 ```
 
-Access FastAPI UI by open your browser at http://127.0.0.1:8000/docs. Open the POST method tab and click on *Try it out*.
-You can manipulate the JSON request body as you desire. Clicking on *Execute* does the following:
+Access FastAPI UI by open your browser at http://127.0.0.1:8000/docs. Open the POST method tab and click on `Try it out`.
+You can manipulate the JSON request body as you desire. Clicking on `Execute` does the following:
  
 - Make an API call to [STATWORX COVID-19 API](https://github.com/STATWORX/covid-19-api) to fetch the latest data
-- Check whether the desired model has already been trained at *pred_start* and trains it if is has not been trained
+- Check whether the desired model has already been trained at `models/your_model_name/your_prediction_date` and trains it if is has not been trained
 - Dumps the new model in `models/your_model_name/your_prediction_date/your_model_name.pkl`
 - Makes prediction using your desired prediction horizon
 
