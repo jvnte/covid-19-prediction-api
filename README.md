@@ -25,7 +25,8 @@ You can manipulate the JSON request body as you desire. Clicking on *Execute* do
  
 - Make an API call to [STATWORX COVID-19 API](https://github.com/STATWORX/covid-19-api) to fetch the latest data
 - Check whether the desired model has already been trained at *pred_start* and trains it if is has not been trained
-- Makes prediction in your desired prediction horizon
+- Dumps the new model in `models/your_model_name/your_prediction_date/your_model_name.pkl`
+- Makes prediction using your desired prediction horizon
 
 The default JSON request body:
 ```json
