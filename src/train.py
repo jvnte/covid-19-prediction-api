@@ -47,9 +47,6 @@ class CovidModel:
 
         # Load model from directory if it has been trained already, otherwise train it
         try:
-            # Get test data for gluonts models
-            if self.type == 'deepar':
-                _, self.y_test = prep_univariate(self.input, pred_start, horizon, type, self.freq)
             self.model = joblib.load(self.model_fname)
         except Exception as _:
             print(f'Creating new {type} model with test period starting from {pred_start} '
@@ -115,15 +112,15 @@ class CovidModel:
             future = self.model.make_future_dataframe(periods=len(pred_dates), include_history=False)
             y_pred = self.model.predict(future).yhat.tolist()
 
-            # Make to Series for output preparation
-            self.y_train = self.y_train.set_index('ds').iloc[:, 0]
-            self.y_test = self.y_test.set_index('ds').iloc[:, 0]
         else:
             y_pred = self.model.predict(fh).tolist()
 
         return y_pred
 
-    def prepare_output(self, forecasts):
+    def prepare_output(self, forecasts, horizon):
+        # Get forecasts depending on horizon
+        forecasts = forecasts[-horizon:]
+
         if self.type == 'deepar':
             # From iterator to pandas
             train = to_pandas(next(iter(self.y_train)))
@@ -137,6 +134,12 @@ class CovidModel:
             prediction.extend(forecasts)
 
         else:
+            if self.type == 'prophet':
+                if not isinstance(self.y_train, pd.Series):
+                    self.y_train = self.y_train.set_index('ds').iloc[:, 0]
+                if not isinstance(self.y_test, pd.Series):
+                    self.y_test = self.y_test.set_index('ds').iloc[:, 0]
+
             date = self.y_train.index.astype(str).tolist()
             date.extend(self.y_test.index.astype(str).tolist())
 

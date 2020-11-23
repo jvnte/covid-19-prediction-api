@@ -31,7 +31,7 @@ def predict(covid: CovidInput):
     forecasts = model.predict(pred_dates)
 
     # Prepare output
-    date, target, prediction = model.prepare_output(forecasts)
+    date, target, prediction = model.prepare_output(forecasts, data['horizon'])
 
     return {'date': date,
             'target': target,
