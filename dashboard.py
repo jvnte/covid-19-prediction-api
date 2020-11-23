@@ -3,6 +3,8 @@ import json
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+
+from pathlib import Path
 from datetime import datetime, timedelta
 
 
@@ -21,9 +23,9 @@ def fetch_from_api(pred_start, type, horizon):
     except RuntimeError:
         print('API not accessible')
 
-    df = pd.DataFrame.from_dict(json.loads(response.text))
+    data = pd.DataFrame.from_dict(json.loads(response.text))
 
-    return df
+    return data
 
 
 MODELS = {'Auto ARIMA': 'auto_arima',
@@ -47,13 +49,23 @@ if __name__ == '__main__':
                                max_value=TODAY - timedelta(days=horizon),
                                value=DEFAULT_DATE)
 
+    model_path = Path(f'model/{MODELS.get(model)}/{pred_start}/{MODELS.get(model)}.pkl')
+    test = model_path.is_file()
+
+    if model_path.is_file():
+        st.info(f'There is a pretrained {model} model available with prediction start {pred_start}.')
+    else:
+        st.warning(f'There is no pretrained {model} model available with prediction start {pred_start}. '
+                   f'Making an API call results in training a new {model} model.')
+
     if st.button('Get predictions'):
+        # Fetch from API
         df = fetch_from_api(pred_start=pred_start.strftime('%Y-%m-%d'),
                             type=MODELS.get(model),
                             horizon=horizon)
 
         # Display only last 60 days
-        df = df.tail(30 * 2)
+        df = df.tail(60)
 
         # From wide to long
         df = pd.melt(df, id_vars=['date'], value_vars=['target', 'prediction'])
