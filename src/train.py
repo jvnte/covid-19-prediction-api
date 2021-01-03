@@ -20,6 +20,7 @@ MULTIVARIATE_MODELS = []
 
 
 class CovidInput(BaseModel):
+    country: str = 'Germany'
     pred_start: str = '2020-11-01'
     type: str = 'auto_arima'
     horizon: int = 7
@@ -27,21 +28,22 @@ class CovidInput(BaseModel):
 
 class CovidModel:
 
-    def __init__(self, pred_start, type, horizon, code='DE', freq='1D'):
+    def __init__(self, pred_start, type, horizon, country, freq='1D'):
         self.horizon = horizon
         self.freq = freq
         self.type = type
+        self.country = country
         # Build model name according to input parameters
-        self.model_fname = f'model/{type}/{pred_start}/{type}.pkl'
+        self.model_fname = f'model/{type}/{pred_start}/{country}/{type}.pkl'
 
         if type not in UNIVARIATE_MODELS or MULTIVARIATE_MODELS:
             raise NotImplementedError(f'Model called {type} not implemented')
 
         # Fetch timeseries from STATWORX API
         try:
-            self.input = fetch_timeseries(code=code)
+            self.input = fetch_timeseries(country=self.country)
         except ImportError:
-            print(f'Not able to fetch COVID-19 data of country {code} from STATWORX API')
+            print(f'Not able to fetch COVID-19 data of {self.country} from API')
 
         self.y_train, self.y_test = prep_univariate(self.input, pred_start, horizon, type, self.freq)
 
@@ -49,7 +51,7 @@ class CovidModel:
         try:
             self.model = joblib.load(self.model_fname)
         except Exception as _:
-            print(f'Creating new {type} model with test period starting from {pred_start} '
+            print(f'Creating new {type} model for {country} with test period starting from {pred_start} '
                   f'and prediction horizon of {horizon} days')
 
             # Prepare prophet data
@@ -57,16 +59,16 @@ class CovidModel:
                 self.y_train, self.y_test = prep_prophet(self.y_train, self.y_test)
 
             # Train and fit selected model
-            self.forecaster = self.train()
-            self.model = self.fit()
+            self.forecaster = self.build_forecaster()
+            self.model = self.train()
 
             # Create directories for saving the model
-            os.makedirs(f'model/{type}/{pred_start}/')
+            os.makedirs(f'model/{type}/{pred_start}/{country}/')
 
             # Dump model pkl file
             joblib.dump(self.model, self.model_fname)
 
-    def train(self):
+    def build_forecaster(self):
         if self.type == 'auto_arima':
             forecaster = AutoARIMA(sp=7, suppress_warnings=True)
         elif self.type == 'prophet':
@@ -86,7 +88,7 @@ class CovidModel:
 
         return forecaster
 
-    def fit(self):
+    def train(self):
         model = self.forecaster
 
         if self.type == 'deepar':
@@ -154,12 +156,19 @@ class CovidModel:
 
 if __name__ == '__main__':
 
-    model = CovidModel(pred_start='2020-11-01',
-                       type='prophet',
-                       horizon=7)
+    pred_start = '2020-11-29'
+    model = 'deepar'
+    horizon = 14
 
-    pred_dates = pd.date_range(start='2020-11-01', periods=7).to_period('D')
+    model = CovidModel(pred_start=pred_start,
+                       type=model,
+                       horizon=horizon)
+
+    pred_dates = pd.date_range(start=pred_start, periods=horizon).to_period('D')
     forecast = model.predict(pred_dates)
     print(forecast)
+
+    date, target, prediction = model.prepare_output(forecast, horizon)
+
 
 

@@ -25,7 +25,7 @@ def predict(covid: CovidInput):
     data = covid.dict()
 
     # Instantiate model
-    model = CovidModel(data['pred_start'], data['type'], data['horizon'])
+    model = CovidModel(data['pred_start'], data['type'], data['horizon'], data['country'])
     pred_dates = pd.date_range(start=data['pred_start'], periods=data['horizon']).to_period('D')
 
     forecasts = model.predict(pred_dates)
