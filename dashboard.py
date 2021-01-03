@@ -45,7 +45,8 @@ def get_table_download_link(df):
     return f'<a href="data:file/csv;base64,{b64}" download="predictions.csv">Download csv file</a>'
 
 
-COUNTRIES = ['Germany', 'China', 'US']
+COUNTRIES = ['Germany', 'China', 'US', 'France', 'India', 'Italy', 'Mexico',
+             'Spain', 'Brasil', 'Canada', 'Japan', 'Russia', 'Poland', 'Israel']
 MODELS = {'Auto ARIMA': 'auto_arima',
           'Prophet': 'prophet',
           'DeepAR': 'deepar'}
@@ -57,7 +58,7 @@ if __name__ == '__main__':
 
     st.header('Welcome to COVID-19 AutoML Dashboard')
 
-    country = st.selectbox('Select the country', list(COUNTRIES))
+    country = st.selectbox('Select the country', sorted(list(COUNTRIES)))
     model = st.selectbox('Select the model to be trained', list(MODELS.keys()))
     horizon = st.slider('Set prediction horizon in days', min_value=1, value=14)
 
