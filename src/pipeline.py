@@ -1,5 +1,7 @@
 import requests
 import json
+
+import numpy as np
 import pandas as pd
 
 from gluonts.dataset.common import ListDataset
@@ -7,14 +9,21 @@ from sktime.forecasting.model_selection import temporal_train_test_split
 from datetime import datetime, timedelta
 
 
-def fetch_timeseries(code: str = 'DE'):
+def fetch_timeseries(country: str = 'Germany'):
     # POST to API
-    payload = {'code': code}
-    url = 'https://api.statworx.com/covid'
-    response = requests.post(url=url, data=json.dumps(payload))
+    url = 'https://pomber.github.io/covid19/timeseries.json'
+    response = requests.get(url=url)
 
     # Convert to data frame
-    df = pd.DataFrame.from_dict(json.loads(response.text))
+    df = pd.DataFrame(json.loads(response.text)[country])
+
+    # Rename columns
+    df.columns = ['date', 'cum_cases', 'cum_deaths', 'cum_recoveries']
+
+    # Create new features
+    df['cases'] = df['cum_cases'].diff().fillna(0).astype(np.int64)
+    df['deaths'] = df['cum_deaths'].diff().fillna(0).astype(np.int64)
+    df['recoveries'] = df['cum_recoveries'].diff().fillna(0).astype(np.int64)
 
     return df
 
@@ -40,7 +49,8 @@ def prep_univariate(df, pred_start, horizon, type, freq):
     if type == 'deepar':
         # Get timeseries
         ts = df.to_numpy()
-        start = pd.Timestamp("31-12-2019", freq=freq)
+
+        start = df.index[0].to_timestamp(freq=freq)
 
         # train dataset: cut the last window of length "prediction_length", add "target" and "start" fields
         y_train = ListDataset([{'target': ts[:-horizon], 'start': start}],
