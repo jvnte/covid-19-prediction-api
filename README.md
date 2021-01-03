@@ -52,6 +52,8 @@ These commands install all the required packages and start the API and dashboard
 browser tab at http://localhost:8501/, while the API is running at http://localhost:8000/. To interact with the API only 
 check out the previous section.
 
+## License
 
+The data is under [CSSEGISandData/COVID-19](https://github.com/CSSEGISandData/COVID-19/) terms of use.
 
 
