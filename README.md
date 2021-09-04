@@ -1,4 +1,4 @@
-## Welcome to COVID-19 AutoML API	
+## Welcome to COVID-19 Prediction API
 
 An API that allows you to easily generate predictions for worldwide COVID-19 cases. The data is fetched using [pomber COVID-19 API](https://github.com/pomber/covid19)
 and [FastAPI](https://fastapi.tiangolo.com/) is used as web framework for building the API. There is also a small
